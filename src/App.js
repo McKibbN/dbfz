@@ -3,6 +3,7 @@ import { Route, Switch } from 'react-router-dom';
 import './App.css';
 import { charactersAPI, auth } from './helpers/urlFor';
 import axios from 'axios';
+import LoadingScreen from './components/LoadingScreen.js'
 import Nav from './components/Nav';
 import Footer from './components/Footer'
 import Home from './components/Home';
@@ -19,6 +20,7 @@ class App extends Component {
   constructor () {
     super();
     this.state = {
+      isLoading: true,
       characters: [],
       character: {},
       isLoggedIn: false,
@@ -53,9 +55,14 @@ class App extends Component {
   }
 
 
-  componentDidMount = () => {    
-    this.getCharacters() 
-    this.loginStatus()      
+  componentDidMount = () => {
+    setTimeout(() => {
+        this.setState({
+            isLoading: false
+        })
+    }, 3000)
+    this.getCharacters()
+    this.loginStatus()
   }
 
   async getCharacters() {
@@ -69,30 +76,29 @@ class App extends Component {
   }
   }
 
-  render() { 
+  render() {
     const { characters, user } = this.state;
 
-    return (  
-        <div className="App">         
-            <Nav characters={characters} loggedInStatus={this.state.isLoggedIn} user={user} handleLogout={this.handleLogout} />
-            
-            <Switch>
-              <Route exact path='/' component={Home} />
-              <Route path='/characters/:id' render={props => (<Character {...props} characters={this.state.characters} character={this.state.character} user={user} />)} />
-              <Route exact path='/learning' component={Learning} />
-              <Route exact path='/universal' component={UniversalData} />
-              <Route exact path='/login' render={props => (<SignIn {...props} handleLogin={this.handleLogin} loggedInStatus={this.state.isLoggedIn} />)} />
-              <Route exact path='/register' render={props => (<Register {...props} handleLogin={this.handleLogin} loggedInStatus={this.state.isLoggedIn} />)} />
-              <Route path= '*' component={NotFound} />
-            </Switch>
+    return (
+        <div className="App">
+          {this.state.isLoading ? <LoadingScreen /> : null}
+          <Nav characters={characters} loggedInStatus={this.state.isLoggedIn} user={user} handleLogout={this.handleLogout} />
+          <Switch>
+            <Route exact path='/' component={Home} />
+            <Route path='/characters/:id' render={props => (<Character {...props} characters={this.state.characters} character={this.state.character} user={user} />)} />
+            <Route exact path='/learning' component={Learning} />
+            <Route exact path='/universal' component={UniversalData} />
+            <Route exact path='/login' render={props => (<SignIn {...props} handleLogin={this.handleLogin} loggedInStatus={this.state.isLoggedIn} />)} />
+            <Route exact path='/register' render={props => (<Register {...props} handleLogin={this.handleLogin} loggedInStatus={this.state.isLoggedIn} />)} />
+            <Route path= '*' component={NotFound} />
+          </Switch>
           <br></br>
           <br></br>
           <ScrollToTop />
           <Footer />
         </div>
-    ); 
+    );
   }
 };
- 
-export default App;
 
+export default App;
